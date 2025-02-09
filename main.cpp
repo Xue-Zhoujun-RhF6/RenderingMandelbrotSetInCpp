@@ -22,14 +22,10 @@ ld sx1, sx2, sy1, sy2; //上次渲染的坐标
 HWND jiaodian, tJiaodian; //绘图窗口的句柄与当前窗口的句柄
 ull threads = 2; 
 
-ImgInfo imgIf;
-
 void cp_q(ld x1, ld y1, ld x2, ld y2) {
 	sx1 = x1, sx2 = x2, sy1 = y1, sy2 = y2;
 	ld delta_c = 1.0 / cpPrec;
-    //ull it1 = 0, it2 = 0;
 	for (ld re = x1; re < x2; re += delta_c) {
-        imgIf.imgData.push_back(vector<char>());
 		for (ld im = y1; im < y2; im += delta_c) {
 			ull tcl = 0;
 			ld rec = 0, imc = 0, re2c = 0, im2c = 0, re_oldc = 0; //快速计算点
@@ -44,24 +40,10 @@ void cp_q(ld x1, ld y1, ld x2, ld y2) {
 					break;
 				}
 			}
-            //imgIf.imgData[it1].push_back(RGB(mColorR * tcl + dColorR, mColorG * tcl + dColorG, mColorB * tcl + dColorB));
 			putpixel(((re - x1) * cpPrec), ((im - y1) * cpPrec), RGB(mColorR * tcl + dColorR, mColorG * tcl + dColorG, mColorB * tcl + dColorB));
-            //++it2;
 		}
-        //++it1;
 	}
 } 
-
-void rdThread(ld x1, ld y1, ld x2, ld y2) {
-	sx1 = x1, sx2 = x2, sy1 = y1, sy2 = y2;
-	thread* th = new thread[threads]();
-	ld jz = (x2 - x1) / threads;
-	for (int i = 0; i < threads; i++) {
-		th[i] = thread(cp_q, x1 + i * jz, y1, x1 + i * jz + jz, y2);
-		th[i].detach();
-	}
-	while (1);
-}
 
 void frm() {
 	tJiaodian = GetForegroundWindow();
@@ -80,7 +62,6 @@ void frm() {
 		cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n精度1/" << cpPrec << "\n";
 		cleardevice();
 		cp_q(x1, y1, x2, y2);
-		//rdThread(x1, y1, x2, y2);
 		Sleep(100);
 	}
 	else if (KEY_DOWN(VK_RBUTTON) && tJiaodian == jiaodian && p.x > 0 && p.y > 0) {
@@ -92,7 +73,6 @@ void frm() {
 		cout << x1 << " " << y1 << " " << x2 << " " << y2 << "\n精度1/" << cpPrec << "\n";
 		cleardevice();
 		cp_q(x1, y1, x2, y2);
-		//rdThread(x1, y1, x2, y2);
 		Sleep(100);
 	}
     Sleep(50);
@@ -103,9 +83,7 @@ int main() {
 	int tm1 = clock();
 	initgraph(800, 800, EX_SHOWCONSOLE);
 	jiaodian = GetForegroundWindow();
-    //imgIf = readBitmap("F:\\cpp_imgs\\test1.bmp");
 	cp_q(-2, -2, 2, 2);
-    //saveBitmap(imgIf);
 	cout << clock() - tm1;
 	while (1) frm();
 	closegraph();

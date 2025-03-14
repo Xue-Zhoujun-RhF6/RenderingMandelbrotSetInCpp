@@ -38,26 +38,25 @@ void cp_q(ld x1, ld y1, ld x2, ld y2) {
     vector<thread> thread_pool;
 
     for (ull t = 0; t < threads; ++t) {
-		thread_pool.emplace_back([=]() { //多线程渲染
-            for (ld re = x1 + t * delta_c; re < x2; re += delta_c * threads) {
-                for (ld im = y1; im < y2; im += delta_c) {
-                    ull tcl = 0;
-                    ld rec = 0, imc = 0, re2c = 0, im2c = 0, re_oldc = 0; //快速计算点
-					for (ull i = 0; i < itPrec; i++) { //迭代计算
-                        rec = re2c - im2c + re; 
-                        imc = 2 * re_oldc * imc + im;
-                        re_oldc = rec;
-                        re2c = rec * rec;
-                        im2c = imc * imc;
-                        if (sqrt(re2c + im2c) > vFs) {
-                            tcl = 200 * i;
-                            break;
-                        }
+	thread_pool.emplace_back([=]() { //多线程渲染
+        for (ld re = x1 + t * delta_c; re < x2; re += delta_c * threads) {
+            for (ld im = y1; im < y2; im += delta_c) {
+                ull tcl = 0;
+                ld rec = 0, imc = 0, re2c = 0, im2c = 0, re_oldc = 0; //快速计算点
+		for (ull i = 0; i < itPrec; i++) { //迭代计算
+                    rec = re2c - im2c + re; 
+                    imc = 2 * re_oldc * imc + im;
+                    re_oldc = rec;
+                    re2c = rec * rec;
+                    im2c = imc * imc;
+                    if (sqrt(re2c + im2c) > vFs) {
+                        tcl = 200 * i;
+                        break;
                     }
-                    draw_pixel(re, im, tcl);
                 }
+                draw_pixel(re, im, tcl);
             }
-            });
+        }});
     }
 
     for (auto& t : thread_pool) {
